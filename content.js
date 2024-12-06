@@ -9,31 +9,31 @@ chrome.storage.sync.get(['groups'], (result) => {
     // Função para tocar um som de alerta
     function playAlertSound() {
         const audio = new Audio(chrome.runtime.getURL('alert.mp3'));
-        audio.loop = true; // Configura o áudio para tocar em loop
-        audio.play();
+        audio.loop = true;
+        audio.play().catch(error => {
+            console.error("Erro ao reproduzir áudio:", error);
+        });
         return audio;
-    }
+    }    
+    
 
     // Monitorar mensagens no DOM
     function monitorMessages() {
-        // Substitua '.chat-title-class' e '.message-class' pelas classes corretas
-        const chatTitles = document.querySelectorAll('.chat-title-class'); 
-        const messages = document.querySelectorAll('.message-class');
+        // Use a classe que você encontrou para selecionar as mensagens
+        const messages = document.querySelectorAll('._ak8q');
 
         let audioPlaying = null;
 
-        chatTitles.forEach((title, index) => {
-            if (groups.includes(title.textContent)) {
-                const message = messages[index];
-                if (message && containsNumber(message.textContent)) {
-                    if (!audioPlaying) {
-                        audioPlaying = playAlertSound();
-                    }
-                } else {
-                    if (audioPlaying) {
-                        audioPlaying.pause();
-                        audioPlaying = null;
-                    }
+        messages.forEach((messageElement) => {
+            const messageText = messageElement.textContent;
+            if (containsNumber(messageText)) {
+                if (!audioPlaying) {
+                    audioPlaying = playAlertSound();
+                }
+            } else {
+                if (audioPlaying) {
+                    audioPlaying.pause();
+                    audioPlaying = null;
                 }
             }
         });
