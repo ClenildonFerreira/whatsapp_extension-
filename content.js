@@ -1,3 +1,6 @@
+const audio = new Audio(chrome.runtime.getURL('alert.mp3'));
+const playPromise = audio.play();
+
 chrome.storage.sync.get(['groups'], (result) => {
     const groups = result.groups || [];
 
@@ -6,15 +9,23 @@ chrome.storage.sync.get(['groups'], (result) => {
         return /\d/.test(message);
     }
 
-    // Função para tocar um som de alerta
+
     function playAlertSound() {
-        const audio = new Audio(chrome.runtime.getURL('alert.mp3'));
         audio.loop = true;
         audio.play().catch(error => {
             console.error("Erro ao reproduzir áudio:", error);
         });
         return audio;
-    }    
+    }
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Reprodução iniciada
+      }).catch(error => {
+        console.error("Erro ao reproduzir áudio:", error);
+      });
+    }
+    
     
 
     // Monitorar mensagens no DOM
